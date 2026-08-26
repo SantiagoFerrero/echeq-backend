@@ -1,0 +1,9 @@
+target/
+.git
+.idea
+.mvn
+*.iml
+*.log
+hs_err_pid*
+README.md
+.env

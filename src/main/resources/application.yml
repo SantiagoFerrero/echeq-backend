@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: echeq-management-system
+
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/echeq_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Argentina/Buenos_Aires}
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:Santiago2002&}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    show-sql: true
+
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+    tryItOutEnabled: true
+
+  api-docs:
+    path: /v3/api-docs
+
+server:
+  port: ${SERVER_PORT:8080}
+
+jwt:
+  secret: ${JWT_SECRET:5H8L2K9M4N7P1Q6R8S3T5V9X2Z4A7B1C6D8E0F3G5H7J9K2L4M6N8P1Q3R5T7V9}
+  expiration: ${JWT_EXPIRATION:3600000}
+
+logging:
+  level:
+    org.springframework.security: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
