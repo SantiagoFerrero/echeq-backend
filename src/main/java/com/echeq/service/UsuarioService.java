@@ -5,6 +5,7 @@ import com.echeq.dto.request.usuario.CrearUsuarioRequest;
 import com.echeq.dto.response.usuario.UsuarioResponse;
 import com.echeq.entity.Rol;
 import com.echeq.entity.Usuario;
+import com.echeq.enums.NombreRol;
 import com.echeq.exception.ResourceNotFoundException;
 import com.echeq.mapper.UsuarioMapper;
 import com.echeq.repository.RolRepository;
@@ -38,6 +39,15 @@ public class UsuarioService {
     public List<UsuarioResponse> obtenerTodos() {
 
         return usuarioRepository.findAll()
+                .stream()
+                .map(mapper::toResponse)
+                .toList();
+    }
+
+    public List<UsuarioResponse> obtenerClientesActivos() {
+
+        return usuarioRepository
+                .findByRol_NombreAndActivoTrue(NombreRol.CLIENTE)
                 .stream()
                 .map(mapper::toResponse)
                 .toList();

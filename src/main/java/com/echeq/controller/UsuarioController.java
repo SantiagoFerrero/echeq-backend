@@ -33,6 +33,15 @@ public class UsuarioController {
         );
     }
 
+    @GetMapping("/clientes")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERADOR')")
+    public ResponseEntity<List<UsuarioResponse>> obtenerClientesActivos() {
+
+        return ResponseEntity.ok(
+                usuarioService.obtenerClientesActivos()
+        );
+    }
+
     @PostMapping
     public ResponseEntity<UsuarioResponse> crear(
             @Valid @RequestBody CrearUsuarioRequest request) {

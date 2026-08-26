@@ -86,8 +86,14 @@ public class SecurityConfig {
                         // USUARIOS
                         // ==========================================
 
+                        .requestMatchers("/api/usuarios/clientes")
+
+                                .hasAnyRole("ADMIN", "OPERADOR")
+
+
                         .requestMatchers("/api/usuarios/**")
-                        .hasRole("ADMIN")
+
+                                .hasRole("ADMIN")
 
                         // ==========================================
                         // ROLES
