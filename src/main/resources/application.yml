@@ -5,7 +5,7 @@ spring:
   datasource:
     url: ${DB_URL:jdbc:mysql://localhost:3306/echeq_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Argentina/Buenos_Aires}
     username: ${DB_USER:root}
-    password: ${DB_PASSWORD:Santiago2002&}
+    password: ${DB_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -33,8 +33,12 @@ server:
   port: ${SERVER_PORT:8080}
 
 jwt:
-  secret: ${JWT_SECRET:5H8L2K9M4N7P1Q6R8S3T5V9X2Z4A7B1C6D8E0F3G5H7J9K2L4M6N8P1Q3R5T7V9}
+  secret: ${JWT_SECRET}
   expiration: ${JWT_EXPIRATION:3600000}
+
+app:
+  demo-data:
+    enabled: ${DEMO_DATA_ENABLED:false}
 
 logging:
   level:

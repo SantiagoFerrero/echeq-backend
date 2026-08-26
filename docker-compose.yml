@@ -47,6 +47,7 @@ services:
 
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION: ${JWT_EXPIRATION}
+      DEMO_DATA_ENABLED: ${DEMO_DATA_ENABLED}
 
 volumes:
   mysql_data:

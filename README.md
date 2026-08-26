@@ -143,3 +143,17 @@ Las funcionalidades principales se encuentran implementadas y validadas.
 ## Frontend
 
 El frontend se encuentra desarrollado en Flutter y consume esta API REST.
+
+## Usuarios de demostración
+
+Cuando DEMO_DATA_ENABLED=true, el backend crea automáticamente los siguientes usuarios en una base nueva:
+
+| Rol | Email | Contraseña |
+| --- | --- | --- |
+| ADMIN | admin@echeq.com | Admin1234 |
+| OPERADOR | operador@echeq.com | Operador1234 |
+| AUDITOR | auditor@echeq.com | Auditor1234 |
+| CLIENTE | usuario.flutter@echeq.com | Flutter1234 |
+
+Estas credenciales son únicamente para demostración y pruebas.
+Para desactivar la creación automática de estos usuarios utilizar DEMO_DATA_ENABLED=false.
