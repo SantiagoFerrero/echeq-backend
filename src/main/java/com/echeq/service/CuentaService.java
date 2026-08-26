@@ -135,7 +135,7 @@ public class CuentaService {
         if (!esCliente(autenticado)) {
 
             throw new SecurityException(
-                    "Esta operaciÃ³n solamente estÃ¡ disponible para clientes"
+                    "Esta operación solamente está disponible para clientes"
             );
         }
 
@@ -210,7 +210,7 @@ public class CuentaService {
                 .existsByNumeroCuenta(numeroCuenta)) {
 
             throw new BusinessException(
-                    "Ya existe una cuenta con ese nÃºmero"
+                    "Ya existe una cuenta con ese número"
             );
         }
 
@@ -340,7 +340,7 @@ public class CuentaService {
                 )) {
 
             throw new BusinessException(
-                    "Ya existe una cuenta con ese nÃºmero"
+                    "Ya existe una cuenta con ese número"
             );
         }
 
