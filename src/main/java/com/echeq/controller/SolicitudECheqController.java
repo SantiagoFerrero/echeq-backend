@@ -5,14 +5,19 @@ import com.echeq.dto.request.solicitudEcheq.CambiarEstadoSolicitudECheqRequest;
 import com.echeq.dto.request.solicitudEcheq.CrearSolicitudECheqRequest;
 import com.echeq.dto.response.solicitudEcheq.SolicitudECheqResponse;
 import com.echeq.service.SolicitudECheqService;
+import com.echeq.enums.EstadoSolicitud;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -33,21 +38,95 @@ public class SolicitudECheqController {
             "hasAnyRole('ADMIN', 'OPERADOR', 'AUDITOR')"
     )
     public ResponseEntity<List<SolicitudECheqResponse>>
-    obtenerTodas() {
+    obtenerTodas(
+            @RequestParam(required = false) Long usuarioId,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate fechaDesde,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate fechaHasta,
+            @RequestParam(required = false)
+            EstadoSolicitud estado,
+            @RequestParam(required = false)
+            String concepto) {
 
         return ResponseEntity.ok(
-                service.obtenerTodas()
+                service.filtrarSolicitudes(
+                        usuarioId,
+                        fechaDesde,
+                        fechaHasta,
+                        estado,
+                        concepto
+                )
         );
     }
 
     @GetMapping("/mis-solicitudes")
     @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<List<SolicitudECheqResponse>>
-    obtenerMisSolicitudes() {
+    obtenerMisSolicitudes(
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate fechaDesde,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate fechaHasta,
+            @RequestParam(required = false)
+            EstadoSolicitud estado,
+            @RequestParam(required = false)
+            String concepto) {
 
         return ResponseEntity.ok(
-                service.obtenerMisSolicitudes()
+                service.filtrarMisSolicitudes(
+                        fechaDesde,
+                        fechaHasta,
+                        estado,
+                        concepto
+                )
         );
+    }
+
+    @GetMapping("/exportar")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN', 'OPERADOR')"
+    )
+    public ResponseEntity<byte[]> exportar(
+            @RequestParam(required = false) Long usuarioId,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate fechaDesde,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate fechaHasta,
+            @RequestParam(required = false)
+            EstadoSolicitud estado,
+            @RequestParam(required = false)
+            String concepto) {
+
+        byte[] archivo = service.exportarSolicitudes(
+                usuarioId,
+                fechaDesde,
+                fechaHasta,
+                estado,
+                concepto
+        );
+
+        String nombreArchivo =
+                "solicitudes_echeq_" + LocalDate.now() + ".xlsx";
+
+        return ResponseEntity.ok()
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=" + nombreArchivo
+                )
+                .contentType(
+                        MediaType.parseMediaType(
+                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        )
+                )
+                .contentLength(archivo.length)
+                .body(archivo);
     }
 
     @GetMapping("/{id}")

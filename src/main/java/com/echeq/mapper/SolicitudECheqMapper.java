@@ -127,6 +127,26 @@ public class SolicitudECheqMapper {
             response.setCuentaCorrienteAlias(
                     solicitud.getCuentaCorriente().getAlias()
             );
+
+            response.setCuentaCorrienteNumero(
+                    solicitud.getCuentaCorriente().getNumeroCuentaCorriente()
+            );
+
+            response.setCbu(
+                    solicitud.getCuentaCorriente().getCbu()
+            );
+
+            if (solicitud.getCuentaCorriente().getCuentaBanco() != null
+                    && solicitud.getCuentaCorriente().getCuentaBanco().getBanco() != null) {
+
+                response.setBancoId(
+                        solicitud.getCuentaCorriente().getCuentaBanco().getBanco().getId()
+                );
+
+                response.setBancoNombre(
+                        solicitud.getCuentaCorriente().getCuentaBanco().getBanco().getNombre()
+                );
+            }
         }
 
         response.setEstado(

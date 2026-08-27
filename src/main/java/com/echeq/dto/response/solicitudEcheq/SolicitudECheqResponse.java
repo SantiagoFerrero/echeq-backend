@@ -16,6 +16,11 @@ public class SolicitudECheqResponse {
 
     private Long cuentaCorrienteId;
     private String cuentaCorrienteAlias;
+    private String cuentaCorrienteNumero;
+    private String cbu;
+
+    private Long bancoId;
+    private String bancoNombre;
 
     private EstadoSolicitud estado;
 
@@ -84,6 +89,38 @@ public class SolicitudECheqResponse {
 
     public void setCuentaCorrienteAlias(String cuentaCorrienteAlias) {
         this.cuentaCorrienteAlias = cuentaCorrienteAlias;
+    }
+
+    public String getCuentaCorrienteNumero() {
+        return cuentaCorrienteNumero;
+    }
+
+    public void setCuentaCorrienteNumero(String cuentaCorrienteNumero) {
+        this.cuentaCorrienteNumero = cuentaCorrienteNumero;
+    }
+
+    public String getCbu() {
+        return cbu;
+    }
+
+    public void setCbu(String cbu) {
+        this.cbu = cbu;
+    }
+
+    public Long getBancoId() {
+        return bancoId;
+    }
+
+    public void setBancoId(Long bancoId) {
+        this.bancoId = bancoId;
+    }
+
+    public String getBancoNombre() {
+        return bancoNombre;
+    }
+
+    public void setBancoNombre(String bancoNombre) {
+        this.bancoNombre = bancoNombre;
     }
 
     public EstadoSolicitud getEstado() {

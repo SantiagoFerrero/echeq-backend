@@ -24,6 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -37,6 +38,7 @@ public class SolicitudECheqService {
     private final CuentaCorrienteRepository cuentaCorrienteRepository;
     private final UsuarioRepository usuarioRepository;
     private final SolicitudECheqMapper solicitudECheqMapper;
+    private final SolicitudECheqExcelService solicitudECheqExcelService;
 
     public SolicitudECheqService(
             SolicitudECheqRepository solicitudRepository,
@@ -45,7 +47,8 @@ public class SolicitudECheqService {
             AuditoriaService auditoriaService,
             CuentaCorrienteRepository cuentaCorrienteRepository,
             UsuarioRepository usuarioRepository,
-            SolicitudECheqMapper solicitudECheqMapper) {
+            SolicitudECheqMapper solicitudECheqMapper,
+            SolicitudECheqExcelService solicitudECheqExcelService) {
 
         this.solicitudRepository = solicitudRepository;
         this.aprobacionRepository = aprobacionRepository;
@@ -54,6 +57,7 @@ public class SolicitudECheqService {
         this.cuentaCorrienteRepository = cuentaCorrienteRepository;
         this.usuarioRepository = usuarioRepository;
         this.solicitudECheqMapper = solicitudECheqMapper;
+        this.solicitudECheqExcelService = solicitudECheqExcelService;
     }
 
     private Usuario obtenerUsuarioAutenticado() {
@@ -146,6 +150,149 @@ public class SolicitudECheqService {
                 .stream()
                 .map(solicitudECheqMapper::toResponse)
                 .toList();
+    }
+
+
+    public List<SolicitudECheqResponse> filtrarSolicitudes(
+            Long usuarioId,
+            LocalDate fechaDesde,
+            LocalDate fechaHasta,
+            EstadoSolicitud estado,
+            String concepto) {
+
+        Usuario usuario = obtenerUsuarioAutenticado();
+
+        if (!esAdministrador(usuario)
+                && !esOperador(usuario)
+                && !esAuditor(usuario)) {
+
+            throw new SecurityException(
+                    "No tiene permisos para consultar todas las solicitudes"
+            );
+        }
+
+        validarRangoFechas(
+                fechaDesde,
+                fechaHasta
+        );
+
+        LocalDateTime desde =
+                fechaDesde != null
+                        ? fechaDesde.atStartOfDay()
+                        : null;
+
+        LocalDateTime hasta =
+                fechaHasta != null
+                        ? fechaHasta.plusDays(1).atStartOfDay()
+                        : null;
+
+        String conceptoNormalizado =
+                concepto != null && !concepto.isBlank()
+                        ? concepto.trim()
+                        : null;
+
+        return solicitudRepository
+                .filtrar(
+                        usuarioId,
+                        desde,
+                        hasta,
+                        estado,
+                        conceptoNormalizado
+                )
+                .stream()
+                .map(solicitudECheqMapper::toResponse)
+                .toList();
+    }
+
+    public List<SolicitudECheqResponse> filtrarMisSolicitudes(
+            LocalDate fechaDesde,
+            LocalDate fechaHasta,
+            EstadoSolicitud estado,
+            String concepto) {
+
+        Usuario usuario = obtenerUsuarioAutenticado();
+
+        if (!esCliente(usuario)) {
+            throw new SecurityException(
+                    "Esta operación está disponible únicamente para clientes"
+            );
+        }
+
+        validarRangoFechas(
+                fechaDesde,
+                fechaHasta
+        );
+
+        LocalDateTime desde =
+                fechaDesde != null
+                        ? fechaDesde.atStartOfDay()
+                        : null;
+
+        LocalDateTime hasta =
+                fechaHasta != null
+                        ? fechaHasta.plusDays(1).atStartOfDay()
+                        : null;
+
+        String conceptoNormalizado =
+                concepto != null && !concepto.isBlank()
+                        ? concepto.trim()
+                        : null;
+
+        return solicitudRepository
+                .filtrar(
+                        usuario.getId(),
+                        desde,
+                        hasta,
+                        estado,
+                        conceptoNormalizado
+                )
+                .stream()
+                .map(solicitudECheqMapper::toResponse)
+                .toList();
+    }
+
+    private void validarRangoFechas(
+            LocalDate fechaDesde,
+            LocalDate fechaHasta) {
+
+        if (fechaDesde != null
+                && fechaHasta != null
+                && fechaHasta.isBefore(fechaDesde)) {
+
+            throw new IllegalArgumentException(
+                    "La fecha hasta no puede ser anterior a la fecha desde"
+            );
+        }
+    }
+    public byte[] exportarSolicitudes(
+            Long usuarioId,
+            LocalDate fechaDesde,
+            LocalDate fechaHasta,
+            EstadoSolicitud estado,
+            String concepto) {
+
+        Usuario usuario = obtenerUsuarioAutenticado();
+
+        if (!esAdministrador(usuario)
+                && !esOperador(usuario)) {
+
+            throw new SecurityException(
+                    "No tiene permisos para exportar solicitudes"
+            );
+        }
+
+        List<SolicitudECheqResponse> solicitudes =
+                filtrarSolicitudes(
+                        usuarioId,
+                        fechaDesde,
+                        fechaHasta,
+                        estado,
+                        concepto
+                );
+
+        return solicitudECheqExcelService.generar(
+                solicitudes
+        );
     }
 
     public SolicitudECheqResponse obtenerPorId(Long id) {
